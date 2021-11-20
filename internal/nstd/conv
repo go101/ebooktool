@@ -1,0 +1,7 @@
+package nstd
+
+/*
+any interger -> string
+integer -> bool
+bool -> int
+*/
