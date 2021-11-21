@@ -3,6 +3,8 @@
 by using `pandoc` and `calibre` tools. In other words, it is a supplyment
 to the other tools.
 
+The module path of this tool is `go101.org/ebooktool`.
+
 Currently, `ebooktool` may convert the markdown files in a directory into
 * an epub file.
 * one single html file.
@@ -15,8 +17,10 @@ Currently,
 * the markdown files are sorted by alphabetical order.
 * images are not handled.
 
-An `.ini` file is needed to setup the conversion arguments.
-The folowing are some example config files for a book (written in markdown):
+One or more `.ini` file is needed to setup the conversion arguments.
+Run `ebooktool xxx.ini yyy.ini` to build ebooks.
+
+The folowing will list some example config files (ini format) for a book (written in markdown).
 
 The `ebooktool-common.inc` file:
 ```ini
