@@ -29,7 +29,7 @@ func Run(bookInfo *internal.BookInfo) error {
 			os.Remove(tempHtmlFile)
 		}()
 
-		err := mds2html.Run(bookInfo)
+		err := mds2html.Run(bookInfo, false)
 		if err != nil {
 			return err
 		}
@@ -65,6 +65,7 @@ func epub2more_pandoc(outputFilename, tempEpubFile string) error {
 	output, err := internal.ExecCommand(time.Minute*5, ".", nil, conversionParameters...)
 	if err != nil {
 		log.Printf("%s\n%s", output, err)
+		return err
 	}
 
 	return nil
@@ -80,7 +81,8 @@ func epub2more_calibre(outputFilename, inputFilename string) error {
 	output, err := internal.ExecCommand(time.Minute*5, ".", nil, conversionParameters...)
 	if err != nil {
 		log.Printf("%s\n%s", output, err)
+		return err
 	}
 
-	return err
+	return nil
 }

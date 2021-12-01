@@ -1,5 +1,5 @@
 package nstd
 
-// Decap
+// Clip
 
-// TrimEnd(numRemoved in)
+// TrimEnd(numRemoved Int)

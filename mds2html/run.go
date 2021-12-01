@@ -12,7 +12,7 @@ import (
 	"go101.org/ebooktool/internal/nstd"
 )
 
-func Run(bookInfo *internal.BookInfo) error {
+func Run(bookInfo *internal.BookInfo, forPDF bool) error {
 	htmlFile := bookInfo.OutputPath
 	mdsDir := bookInfo.InputPath
 	cssFile := bookInfo.StyleCSS
@@ -88,11 +88,15 @@ func Run(bookInfo *internal.BookInfo) error {
 		base64Data := make([]byte, (len(imgData)+2)/3*4)
 		base64.StdEncoding.Encode(base64Data, imgData)
 
-		coverImageHTML.WriteString(`<img src="data:image/`)
+		if forPDF {
+			coverImageHTML.WriteString(`<img style="width: auto; max-height: 100%;" src="data:image/`)
+		} else {
+			coverImageHTML.WriteString(`<img style="max-width: 100%; height: auto;" src="data:image/`)
+		}
 		coverImageHTML.WriteString(imgType)
 		coverImageHTML.WriteString(`;base64,`)
 		coverImageHTML.Write(base64Data)
-		coverImageHTML.WriteString(`" style="max-width: 100%; height: auto;"></img>`)
+		coverImageHTML.WriteString(`"></img>`)
 	}
 
 	var tocContent bytes.Buffer

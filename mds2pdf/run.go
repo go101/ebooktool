@@ -30,7 +30,7 @@ func Run(bookInfo *internal.BookInfo) error {
 			os.Remove(tempHtmlFile)
 		}()
 
-		err := mds2html.Run(bookInfo)
+		err := mds2html.Run(bookInfo, true)
 		if err != nil {
 			return err
 		}
@@ -65,9 +65,11 @@ func epub2pdf_pandoc(forPrinting bool, outputFilename, tempEpubFile string, main
 	pushParams := func(params ...string) {
 		conversionParameters = append(conversionParameters, params...)
 	}
-	pushParams("pandoc", "--pdf-engine", "xelatex", "--toc")
+	pushParams("pandoc", "-s", "--pdf-engine", "xelatex", "--toc")
 	pushParams("--tab-stop", "5", "--number-sections")
+	//pushParams("--number-offset", "-1,0") // useless
 	pushParams("-V", tocTitle)
+	//pushParams("-V", "papersize:a4")
 	pushParams("-V", "documentclass=report")
 	pushParams("-V", "colorlinks")
 	pushParams("-V", "linkcolor=blue")
@@ -85,6 +87,7 @@ func epub2pdf_pandoc(forPrinting bool, outputFilename, tempEpubFile string, main
 	output, err := internal.ExecCommand(time.Minute*5, ".", nil, conversionParameters...)
 	if err != nil {
 		log.Printf("%s\n%s", output, err)
+		return err
 	}
 
 	return nil
@@ -144,7 +147,8 @@ func epub2pdf_calibre(forPrinting bool, outputFilename, inputFilename string, se
 	output, err := internal.ExecCommand(time.Minute*5, ".", nil, conversionParameters...)
 	if err != nil {
 		log.Printf("%s\n%s", output, err)
+		return err
 	}
 
-	return err
+	return nil
 }
