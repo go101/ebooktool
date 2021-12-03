@@ -2,6 +2,8 @@ package internal
 
 import (
 	"bytes"
+	"encoding/base64"
+	"fmt"
 	"image"
 	"image/color"
 	"image/draw"
@@ -13,6 +15,8 @@ import (
 
 	"github.com/golang/freetype"
 	"golang.org/x/image/font/gofont/goregular"
+
+	"go101.org/ebooktool/internal/nstd"
 )
 
 func CreateImageWithOverlayTexts(baseImgPath string, textPlaces ...TextPlacement) (string, error) {
@@ -96,4 +100,28 @@ func DrawTextOnImage(img draw.Image, textPlace TextPlacement) error {
 		return err
 	}
 	return nil
+}
+
+func Base64Image(filename string, imgContent []byte) ([]byte, error) {
+	var imgType string
+	if nstd.String(filename).ToLower().HasSuffix(".png") {
+		imgType = "png"
+	} else if nstd.String(filename).ToLower().HasSuffix(".gif") {
+		imgType = "gif"
+	} else if nstd.String(filename).ToLower().HasSuffix(".jpg") ||
+		nstd.String(filename).ToLower().HasSuffix(".jpeg") {
+		imgType = "jpeg"
+	} else {
+		return nil, fmt.Errorf("unsupported image mime type: %s", filename)
+	}
+
+	headerLen := len("data:image/") + len(imgType) + len(";base64,")
+	base64Data := make([]byte, headerLen+(len(imgContent)+2)/3*4)
+	base64.StdEncoding.Encode(base64Data[headerLen:], imgContent)
+	header := base64Data[:0]
+	header = append(header, "data:image/"...)
+	header = append(header, imgType...)
+	header = append(header, ";base64,"...)
+
+	return base64Data, nil
 }

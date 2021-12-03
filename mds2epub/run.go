@@ -15,9 +15,11 @@ func Run(bookInfo *internal.BookInfo) error {
 	bookTitle := bookInfo.Title
 	bookAuthor := bookInfo.Author
 
+	epubBook := internal.NewEpubFile()
+
 	// load
 
-	files, err := internal.ReadFiles(mdsDir, func(filename string) bool {
+	files, err := internal.ReadDirFiles(mdsDir, func(filename string) bool {
 		return nstd.String(filename).ToLower().HasSuffix(".md")
 	})
 	if err != nil {
@@ -36,6 +38,18 @@ func Run(bookInfo *internal.BookInfo) error {
 		md.SetOutputFile(nstd.String(f.Name).ToLower().ReplaceSuffix(".md", ".xhtml").String())
 		mdFiles[i] = *md
 	}
+
+	imageFiles := internal.CollectMarkdownImageFiles(mdFiles, mdsDir, false)
+	for path := range imageFiles {
+		internalPath, err := epubBook.AddImage(path)
+		if err != nil {
+			return fmt.Errorf("add epub image file (%s) error: %s", path, err)
+		}
+
+		imageFiles[path] = []byte(internalPath)
+	}
+
+	internal.ReplaceMarkdownImageHrefs(mdFiles, mdsDir, imageFiles)
 
 	// render
 
@@ -73,5 +87,5 @@ func Run(bookInfo *internal.BookInfo) error {
 	if bookInfo.ReleaseDate != "" {
 		epubTitle += " (" + bookInfo.ReleaseDate + ")"
 	}
-	return internal.CreateEpubFile(epubFile, epubTitle, bookAuthor, cssFile, coverFile, sections)
+	return epubBook.CreateEpubFile(epubFile, epubTitle, bookAuthor, cssFile, coverFile, sections)
 }

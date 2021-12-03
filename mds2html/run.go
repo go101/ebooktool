@@ -2,7 +2,6 @@ package mds2html
 
 import (
 	"bytes"
-	"encoding/base64"
 	"fmt"
 	"html"
 	"os"
@@ -12,7 +11,7 @@ import (
 	"go101.org/ebooktool/internal/nstd"
 )
 
-func Run(bookInfo *internal.BookInfo, forPDF bool) error {
+func Run(bookInfo *internal.BookInfo, forPDF, convertCodeLeadingTabsToSpaces bool) error {
 	htmlFile := bookInfo.OutputPath
 	mdsDir := bookInfo.InputPath
 	cssFile := bookInfo.StyleCSS
@@ -27,7 +26,7 @@ func Run(bookInfo *internal.BookInfo, forPDF bool) error {
 
 	// load
 
-	files, err := internal.ReadFiles(mdsDir, func(filename string) bool {
+	files, err := internal.ReadDirFiles(mdsDir, func(filename string) bool {
 		return nstd.String(filename).ToLower().HasSuffix(".md")
 	})
 	if err != nil {
@@ -45,7 +44,22 @@ func Run(bookInfo *internal.BookInfo, forPDF bool) error {
 		md.SetFilename(f.Name)
 		md.SetOutputFile(outputFile)
 		mdFiles[i] = *md
+		if convertCodeLeadingTabsToSpaces {
+			md.ConvertCodeLeadingTabsToSpaces(5)
+		}
 	}
+
+	imageFiles := internal.CollectMarkdownImageFiles(mdFiles, mdsDir, true)
+	for path, content := range imageFiles {
+		base64Data, err := internal.Base64Image(path, content)
+		if err != nil {
+			return err
+		}
+
+		imageFiles[path] = base64Data
+	}
+
+	internal.ReplaceMarkdownImageHrefs(mdFiles, mdsDir, imageFiles)
 
 	// render
 
@@ -69,32 +83,21 @@ func Run(bookInfo *internal.BookInfo, forPDF bool) error {
 
 	var coverImageHTML bytes.Buffer
 	if coverFile != "" {
-		var imgType string
-		if nstd.String(coverFile).ToLower().HasSuffix(".png") {
-			imgType = "png"
-		} else if nstd.String(coverFile).ToLower().HasSuffix(".gif") {
-			imgType = "gif"
-		} else if nstd.String(coverFile).ToLower().HasSuffix(".jpg") ||
-			nstd.String(coverFile).ToLower().HasSuffix(".jpeg") {
-			imgType = "jpeg"
-		} else {
-			return fmt.Errorf("unsupported image mime type: %s", coverFile)
-		}
-
 		imgData, err := os.ReadFile(coverFile)
 		if err != nil {
 			return err
 		}
-		base64Data := make([]byte, (len(imgData)+2)/3*4)
-		base64.StdEncoding.Encode(base64Data, imgData)
+
+		base64Data, err := internal.Base64Image(coverFile, imgData)
+		if err != nil {
+			return err
+		}
 
 		if forPDF {
-			coverImageHTML.WriteString(`<img style="width: auto; max-height: 100%;" src="data:image/`)
+			coverImageHTML.WriteString(`<img style="width: auto; max-height: 100%;" src="`)
 		} else {
-			coverImageHTML.WriteString(`<img style="max-width: 100%; height: auto;" src="data:image/`)
+			coverImageHTML.WriteString(`<img style="max-width: 100%; height: auto;" src="`)
 		}
-		coverImageHTML.WriteString(imgType)
-		coverImageHTML.WriteString(`;base64,`)
 		coverImageHTML.Write(base64Data)
 		coverImageHTML.WriteString(`"></img>`)
 	}

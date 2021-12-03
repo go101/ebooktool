@@ -103,7 +103,7 @@ func main() {
 		case "htmls":
 			err = mds2htmls.Run(bookInfo)
 		case "html":
-			err = mds2html.Run(bookInfo, false)
+			err = mds2html.Run(bookInfo, false, false)
 		case "epub":
 			err = mds2epub.Run(bookInfo)
 		case "pdf":

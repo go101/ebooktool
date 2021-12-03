@@ -16,13 +16,29 @@ import (
 // 3. avoid duplicate cover when converting to pdf
 // 4. multi-level table of content
 
+type EpubFile struct {
+	f *epub.Epub
+}
+
+func NewEpubFile() *EpubFile {
+	return &EpubFile{
+		f: epub.NewEpub(""),
+	}
+}
+
+func (ef *EpubFile) AddImage(path string) (string, error) {
+	return ef.f.AddImage(path, "")
+}
+
 type EpubSection struct {
 	File
 	Title string
 }
 
-func CreateEpubFile(outputPath, title, author, cssFile, coverFile string, sections []EpubSection) error {
-	epubBook := epub.NewEpub(title)
+func (ef *EpubFile) CreateEpubFile(outputPath, title, author, cssFile, coverFile string, sections []EpubSection) error {
+	//epubBook := epub.NewEpub(title)
+	epubBook := ef.f
+	epubBook.SetTitle(title)
 	epubBook.SetAuthor(author)
 	var cssPath string
 	if cssFile != "" {

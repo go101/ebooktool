@@ -30,7 +30,7 @@ func Run(bookInfo *internal.BookInfo) error {
 			os.Remove(tempHtmlFile)
 		}()
 
-		err := mds2html.Run(bookInfo, true)
+		err := mds2html.Run(bookInfo, true, true)
 		if err != nil {
 			return err
 		}
@@ -65,8 +65,7 @@ func epub2pdf_pandoc(forPrinting bool, outputFilename, tempEpubFile string, main
 	pushParams := func(params ...string) {
 		conversionParameters = append(conversionParameters, params...)
 	}
-	pushParams("pandoc", "-s", "--pdf-engine", "xelatex", "--toc")
-	pushParams("--tab-stop", "5", "--number-sections")
+	pushParams("pandoc", "-s", "--pdf-engine", "xelatex", "--toc", "--number-sections")
 	//pushParams("--number-offset", "-1,0") // useless
 	pushParams("-V", tocTitle)
 	//pushParams("-V", "papersize:a4")
@@ -76,6 +75,7 @@ func epub2pdf_pandoc(forPrinting bool, outputFilename, tempEpubFile string, main
 	pushParams("-V", "urlcolor=blue")
 	pushParams("-V", "toccolor=blue")
 	pushParams("-V", "geometry: top=3cm, bottom=3cm, left=3.9cm, right=3.9cm")
+	pushParams("--tab-stop", "5")
 	if mainFont != "" {
 		pushParams("-V", fmt.Sprintf(`CJKmainfont=%s`, mainFont))
 		pushParams("-V", fmt.Sprintf(`mainfont=%s`, mainFont))

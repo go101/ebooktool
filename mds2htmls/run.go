@@ -14,7 +14,7 @@ func Run(bookInfo *internal.BookInfo) error {
 
 	// load
 
-	files, err := internal.ReadFiles(mdsDir, func(filename string) bool {
+	files, err := internal.ReadDirFiles(mdsDir, func(filename string) bool {
 		return nstd.String(filename).ToLower().HasSuffix(".md")
 	})
 	if err != nil {

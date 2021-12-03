@@ -29,7 +29,7 @@ func Run(bookInfo *internal.BookInfo) error {
 			os.Remove(tempHtmlFile)
 		}()
 
-		err := mds2html.Run(bookInfo, false)
+		err := mds2html.Run(bookInfo, false, false)
 		if err != nil {
 			return err
 		}

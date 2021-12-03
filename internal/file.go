@@ -10,11 +10,12 @@ import (
 )
 
 type File struct {
+	// absolute or relative path, by context
 	Name    string
 	Content []byte
 }
 
-func ReadFiles(dir string, filter func(filename string) bool) ([]File, error) {
+func ReadDirFiles(dir string, filter func(filename string) bool) ([]File, error) {
 	dirfs := os.DirFS(dir)
 	entries, err := fs.ReadDir(dirfs, ".")
 	if err != nil {
@@ -38,6 +39,23 @@ func ReadFiles(dir string, filter func(filename string) bool) ([]File, error) {
 				Content: content,
 			})
 		}
+	}
+
+	return files, nil
+}
+
+func ReadFiles(filepaths []string) ([]File, error) {
+	files := make([]File, 0, len(filepaths))
+	for _, path := range filepaths {
+		content, err := os.ReadFile(path)
+		if err != nil {
+			return nil, fmt.Errorf("os.ReadFile(%s) error: %w", path, err)
+		}
+
+		files = append(files, File{
+			Name:    path,
+			Content: content,
+		})
 	}
 
 	return files, nil

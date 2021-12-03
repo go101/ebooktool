@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"os"
+	"path/filepath"
 	"regexp"
 
 	"github.com/gomarkdown/markdown"
@@ -111,9 +113,101 @@ func findTitle(doc ast.Node) (title string) {
 	return
 }
 
-func findImages(doc ast.Node) (images []string) {
-	// ToDo
-	return nil
+var spaces = bytes.Repeat([]byte{' '}, 1024)
+
+func spaceBytes(n int) []byte {
+	if n < 0 {
+		n = 0
+	} else if n > len(spaces) {
+		n = len(spaces)
+	}
+	return spaces[:n:n]
+}
+
+// ConvertCodeLeadingTabsToSpaces is used to fix pandoc code text alignment problem.
+// ToDo: this is a perfect solution.
+func (md *Markdown) ConvertCodeLeadingTabsToSpaces(numSpaces int) {
+	ast.WalkFunc(
+		md.doc,
+		func(node ast.Node, entering bool) (status ast.WalkStatus) {
+			if !entering {
+				return
+			}
+
+			if cb, ok := node.(*ast.CodeBlock); ok {
+				numTabs := 0
+				for _, b := range cb.Literal {
+					if b == '\t' {
+						numTabs++
+					} else {
+						break
+					}
+				}
+				cb.Literal = append(spaceBytes(numTabs*numSpaces), cb.Literal[numTabs:]...)
+				return ast.SkipChildren
+			}
+
+			return
+		},
+	)
+}
+
+func CollectMarkdownImageFiles(mdFiles []Markdown, mdFilesDir string, loadFileContent bool) map[string][]byte {
+	mdFilesDir = filepath.Clean(mdFilesDir)
+	var files = make(map[string][]byte, 1024)
+	for _, md := range mdFiles {
+		ast.WalkFunc(
+			md.doc,
+			func(node ast.Node, entering bool) (status ast.WalkStatus) {
+				if !entering {
+					return
+				}
+
+				if image, ok := node.(*ast.Image); ok {
+					fullPath, err := filepath.Abs(filepath.Join(mdFilesDir, string(image.Destination)))
+					if err != nil {
+						log.Println("Warning: %s contains an invalid image file path %s, error: %s", md.filename, image.Destination, err)
+					}
+					var content []byte
+					if loadFileContent {
+						content, err = os.ReadFile(fullPath)
+						if err != nil {
+							log.Println("Warning: %s contains an image file failing to load %s (%s), error: %s", md.filename, image.Destination, fullPath, err)
+						}
+					}
+					files[fullPath] = content
+				}
+
+				return
+			},
+		)
+	}
+
+	return files
+}
+
+func ReplaceMarkdownImageHrefs(mdFiles []Markdown, mdFilesDir string, imageFiles map[string][]byte) {
+	mdFilesDir = filepath.Clean(mdFilesDir)
+	for _, md := range mdFiles {
+		ast.WalkFunc(
+			md.doc,
+			func(node ast.Node, entering bool) (status ast.WalkStatus) {
+				if !entering {
+					return
+				}
+
+				if image, ok := node.(*ast.Image); ok {
+					fullPath, err := filepath.Abs(filepath.Join(mdFilesDir, string(image.Destination)))
+					if err != nil {
+						log.Println("Warning: %s contains an invalid image file path %s, error: %s", md.filename, image.Destination, err)
+					}
+					image.Destination = imageFiles[fullPath]
+				}
+
+				return
+			},
+		)
+	}
 }
 
 // Why this? Maybe *.mobi files require this.
