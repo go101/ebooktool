@@ -152,6 +152,47 @@ func (md *Markdown) ConvertCodeLeadingTabsToSpaces(numSpaces int) {
 	)
 }
 
+// ConvertCodeLeadingTabsToSpaces is used to fix pandoc code text alignment problem.
+// ToDo: this is a perfect solution.
+func (md *Markdown) ConvertCodeLineLeadingTabsToSpaces(numSpaces int) {
+	ast.WalkFunc(
+		md.doc,
+		func(node ast.Node, entering bool) (status ast.WalkStatus) {
+			if !entering {
+				return
+			}
+
+			if cb, ok := node.(*ast.CodeBlock); ok {
+				var buf bytes.Buffer
+				buf.Grow(len(cb.Literal) * 4 / 3)
+				var data = cb.Literal
+				for len(data) > 0 {
+					i := bytes.IndexByte(data, '\n')
+					if i < 0 {
+						break
+					}
+					buf.Write(data[:i+1]) // including the '\n'
+					data = data[i+1:]
+					for len(data) > 0 {
+						if data[0] == '\t' {
+							buf.Write(spaceBytes(numSpaces))
+							data = data[1:]
+							continue
+						}
+						break
+					}
+				}
+				buf.Write(data)
+
+				cb.Literal = buf.Bytes()
+				return ast.SkipChildren
+			}
+
+			return
+		},
+	)
+}
+
 func CollectMarkdownImageFiles(mdFiles []Markdown, mdFilesDir string, loadFileContent bool) map[string][]byte {
 	mdFilesDir = filepath.Clean(mdFilesDir)
 	var files = make(map[string][]byte, 1024)

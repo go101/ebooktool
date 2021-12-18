@@ -37,6 +37,7 @@ func Run(bookInfo *internal.BookInfo) error {
 		md.SetFilename(f.Name)
 		md.SetOutputFile(nstd.String(f.Name).ToLower().ReplaceSuffix(".md", ".xhtml").String())
 		mdFiles[i] = *md
+		md.ConvertCodeLineLeadingTabsToSpaces(3)
 	}
 
 	imageFiles := internal.CollectMarkdownImageFiles(mdFiles, mdsDir, false)
