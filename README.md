@@ -5,6 +5,11 @@ to the other tools.
 
 The module path of this tool is `go101.org/ebooktool`.
 
+除了epub和html版本输出，其它格式需要安装`pandoc`或者`calibre`。在debian系统中，可以运行一下命令安装所需软件包：
+```
+apt install calibre pandoc texlive texlive-xetex latex-cjk-chinese texlive-lang-chinese fonts-arphic-ukai
+```
+
 Currently, `ebooktool` may convert the markdown files in a directory into
 * an epub file.
 * one single html file.
@@ -212,3 +217,4 @@ book.style: style.css
 ; Supported tools: pandoc | calibre
 ebook.convertor: pandoc
 ```
+
