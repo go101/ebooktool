@@ -57,7 +57,7 @@ func main() {
 	} else {
 		iniFiles = make([]string, 0, flag.NArg())
 		for i := 0; i < flag.NArg(); i++ {
-			if arg := flag.Arg(i); !nstd.String(arg).ToLower().HasSuffix(".ini") {
+			if arg := flag.Arg(i); false && !nstd.String(arg).ToLower().HasSuffix(".ini") {
 				log.Printf("%s is not suffixed with .ini, so it is ignored", arg)
 			} else {
 				iniFiles = append(iniFiles, arg)
