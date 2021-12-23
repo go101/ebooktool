@@ -108,7 +108,7 @@ func main() {
 			err = mds2epub.Run(bookInfo)
 		case "pdf":
 			err = mds2pdf.Run(bookInfo)
-		case "azw3", "mobi":
+		case "azw3", "mobi", "docx":
 			err = mds2more.Run(bookInfo)
 		}
 
