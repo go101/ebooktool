@@ -2,6 +2,7 @@ package mds2epub
 
 import (
 	"fmt"
+	"os"
 
 	"go101.org/ebooktool/internal"
 	"go101.org/ebooktool/internal/nstd"
@@ -88,5 +89,24 @@ func Run(bookInfo *internal.BookInfo) error {
 	if bookInfo.ReleaseDate != "" {
 		epubTitle += " (" + bookInfo.ReleaseDate + ")"
 	}
-	return epubBook.CreateEpubFile(epubFile, epubTitle, bookAuthor, cssFile, coverFile, sections)
+
+	switch c := bookInfo.EBookConvertor; c {
+	case "":
+		return epubBook.CreateEpubFile(epubFile, epubTitle, bookAuthor, cssFile, coverFile, sections)
+	case "pandoc":
+		break
+	default:
+		return fmt.Errorf("ebook converter %s is not supported to convert epub to epub now", c)
+	}
+
+	tempEpubFile := epubFile + ".temp-" + internal.RandomString(8) + ".epub"
+	err = epubBook.CreateEpubFile(tempEpubFile, epubTitle, bookAuthor, cssFile, coverFile, sections)
+	if err != nil {
+		return err
+	}
+	defer func() {
+		os.Remove(tempEpubFile)
+	}()
+
+	return internal.PandocX2Y(epubFile, tempEpubFile)
 }

@@ -2,9 +2,7 @@ package mds2more
 
 import (
 	"fmt"
-	"log"
 	"os"
-	"time"
 
 	"go101.org/ebooktool/internal"
 	"go101.org/ebooktool/mds2epub"
@@ -34,7 +32,7 @@ func Run(bookInfo *internal.BookInfo) error {
 			return err
 		}
 
-		return epub2more_pandoc(outputFile, tempHtmlFile)
+		return internal.PandocX2Y(outputFile, tempHtmlFile)
 
 	case "calibre":
 		// create a temp epub file
@@ -45,44 +43,12 @@ func Run(bookInfo *internal.BookInfo) error {
 			os.Remove(tempEpubFile)
 		}()
 
+		bookInfo.EBookConvertor = "" // to genetate non-validated epub file
 		err := mds2epub.Run(bookInfo)
 		if err != nil {
 			return err
 		}
 
-		return epub2more_calibre(outputFile, tempEpubFile)
+		return internal.CalibreX2Y(outputFile, tempEpubFile)
 	}
-}
-
-func epub2more_pandoc(outputFilename, tempEpubFile string) error {
-	conversionParameters := make([]string, 0, 32)
-	pushParams := func(params ...string) {
-		conversionParameters = append(conversionParameters, params...)
-	}
-
-	pushParams("pandoc", "-o", outputFilename, tempEpubFile)
-
-	output, err := internal.ExecCommand(time.Minute*5, ".", nil, conversionParameters...)
-	if err != nil {
-		log.Printf("%s\n%s", output, err)
-		return err
-	}
-
-	return nil
-}
-
-func epub2more_calibre(outputFilename, inputFilename string) error {
-	conversionParameters := make([]string, 0, 32)
-	pushParams := func(params ...string) {
-		conversionParameters = append(conversionParameters, params...)
-	}
-	pushParams("ebook-convert", inputFilename, outputFilename)
-
-	output, err := internal.ExecCommand(time.Minute*5, ".", nil, conversionParameters...)
-	if err != nil {
-		log.Printf("%s\n%s", output, err)
-		return err
-	}
-
-	return nil
 }

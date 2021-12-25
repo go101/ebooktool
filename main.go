@@ -113,7 +113,7 @@ func main() {
 		}
 
 		if err != nil {
-			log.Println("failed to generate", bookInfo.OutputPath)
+			log.Println("failed to generate", bookInfo.OutputPath, ", err:", err)
 		} else {
 			log.Println("successfully generated", bookInfo.OutputPath)
 		}
