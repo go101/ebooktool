@@ -29,8 +29,10 @@ func Run(bookInfo *internal.BookInfo) error {
 		if err != nil {
 			return fmt.Errorf("parse markdown file (%s) error: %w", f.Name, err)
 		}
+		of := nstd.String(f.Name).ToLower().TrimSuffix(".md").String()
+		of = internal.ValidateIdentifier(of) + ".html"
 		md.SetFilename(f.Name)
-		md.SetOutputFile(nstd.String(f.Name).ToLower().ReplaceSuffix(".md", ".html").String())
+		md.SetOutputFile(of)
 		mdFiles[i] = *md
 	}
 

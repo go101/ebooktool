@@ -275,7 +275,7 @@ func (md *Markdown) Render() []byte {
 
 	// ...
 	var buf bytes.Buffer
-	fmt.Fprintf(&buf, `<p id="%s"></p>`, filename2ID(md.filename))
+	fmt.Fprintf(&buf, `<p id="%s"></p>`, Filename2ID(md.filename))
 	fmt.Fprintln(&buf)
 	buf.Write(htmlBytes)
 
@@ -285,8 +285,8 @@ func (md *Markdown) Render() []byte {
 // ToDo: maybe this is too restricted. At least / is allowed in html5 IDs.
 var invalidCharsInID = regexp.MustCompile(`[^0-9a-zA-Z\-\_\:\.]`)
 
-func filename2ID(filename string) string {
-	return "f-" + invalidCharsInID.ReplaceAllString(filename, "_")
+func Filename2ID(filename string) string {
+	return "f-" + ValidateIdentifier(filename)
 }
 
 func RenderMarkdownFiles(mdFiles []Markdown) map[string][]File {
@@ -316,7 +316,7 @@ func RenderMarkdownFiles(mdFiles []Markdown) map[string][]File {
 	filenamesAsID := make(map[string]string, len(mdFiles))
 	for i := range mdFiles {
 		md := &mdFiles[i]
-		filenamesAsID[md.filename] = filename2ID(md.filename)
+		filenamesAsID[md.filename] = Filename2ID(md.filename)
 	}
 	for i := range mdFiles {
 		md := &mdFiles[i]

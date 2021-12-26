@@ -26,6 +26,10 @@ func (s String) HasSuffix(suffix string) bool {
 	return strings.HasSuffix(string(s), suffix)
 }
 
+func (s String) TrimSuffix(suffix string) String {
+	return String(strings.TrimSuffix(string(s), suffix))
+}
+
 func (s String) ReplaceSuffix(suffix, with string) String {
 	if s.HasSuffix(suffix) {
 		return s[:len(s)-len(suffix)] + String(with)

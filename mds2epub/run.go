@@ -35,8 +35,10 @@ func Run(bookInfo *internal.BookInfo) error {
 		if err != nil {
 			return fmt.Errorf("parse markdown file (%s) error: %w", f.Name, err)
 		}
+		of := nstd.String(f.Name).ToLower().TrimSuffix(".md").String()
+		of = internal.Filename2ID(of) + ".xhtml"
 		md.SetFilename(f.Name)
-		md.SetOutputFile(nstd.String(f.Name).ToLower().ReplaceSuffix(".md", ".xhtml").String())
+		md.SetOutputFile(of)
 		mdFiles[i] = *md
 		md.ConvertCodeLineLeadingTabsToSpaces(3)
 	}

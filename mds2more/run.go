@@ -20,35 +20,27 @@ func Run(bookInfo *internal.BookInfo) error {
 
 	case "pandoc":
 		// create a temp html file
-		tempHtmlFile := outputFile + ".temp-" + internal.RandomString(8) + ".html"
-		bookInfo.OutputPath = tempHtmlFile
-		defer func() {
-			bookInfo.OutputPath = outputFile
-			os.Remove(tempHtmlFile)
-		}()
-
-		err := mds2html.Run(bookInfo, false, false)
+		htmlBookInfo := *bookInfo
+		htmlBookInfo.OutputPath = outputFile + ".temp-" + internal.RandomString(8) + ".html"
+		defer os.Remove(htmlBookInfo.OutputPath)
+		err := mds2html.Run(&htmlBookInfo, false, false)
 		if err != nil {
 			return err
 		}
 
-		return internal.PandocX2Y(outputFile, tempHtmlFile)
+		return internal.PandocX2Y(outputFile, htmlBookInfo.OutputPath)
 
 	case "calibre":
 		// create a temp epub file
-		tempEpubFile := outputFile + ".temp-" + internal.RandomString(8) + ".epub"
-		bookInfo.OutputPath = tempEpubFile
-		defer func() {
-			bookInfo.OutputPath = outputFile
-			os.Remove(tempEpubFile)
-		}()
-
-		bookInfo.EBookConvertor = "" // to genetate non-validated epub file
-		err := mds2epub.Run(bookInfo)
+		epubBookInfo := *bookInfo
+		epubBookInfo.EBookConvertor = "" // to genetate non-validated epub file
+		epubBookInfo.OutputPath = outputFile + ".temp-" + internal.RandomString(8) + ".epub"
+		defer os.Remove(epubBookInfo.OutputPath)
+		err := mds2epub.Run(&epubBookInfo)
 		if err != nil {
 			return err
 		}
 
-		return internal.CalibreX2Y(outputFile, tempEpubFile)
+		return internal.CalibreX2Y(outputFile, epubBookInfo.OutputPath)
 	}
 }
