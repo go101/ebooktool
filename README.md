@@ -25,9 +25,7 @@ Currently, `ebooktool` may convert the markdown files in a directory into
 * an azw3 file.
 * a docx file
 
-Currently,
-* the markdown files are sorted by alphabetical order.
-* images are not handled.
+Currently, the markdown files are sorted by alphabetical order.
 
 One or more `.ini` file is needed to setup the conversion arguments.
 Run `ebooktool xxx.ini yyy.ini` to build ebooks.
