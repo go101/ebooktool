@@ -18,6 +18,7 @@ Currently, `ebooktool` may convert the markdown files in a directory into
 * a pdf files.
 * a mobi file.
 * an azw3 file.
+* a docx file
 
 Currently,
 * the markdown files are sorted by alphabetical order.
