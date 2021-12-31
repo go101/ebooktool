@@ -8,7 +8,12 @@ The module path of this tool is `go101.org/ebooktool`.
 Except epub and html formats, other formants need `pandoc` or `calibre` to be installed.
 On Debian, the installation command is
 ```
-apt install calibre pandoc texlive texlive-xetex latex-cjk-chinese texlive-lang-chinese fonts-arphic-ukai
+apt install calibre pandoc texlive texlive-xetex
+```
+
+For Chinese versions, more need to be installed:
+```
+apt install latex-cjk-chinese texlive-lang-chinese fonts-arphic-ukai
 ```
 
 Currently, `ebooktool` may convert the markdown files in a directory into
