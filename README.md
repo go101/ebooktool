@@ -5,7 +5,8 @@ to the other tools.
 
 The module path of this tool is `go101.org/ebooktool`.
 
-除了epub和html版本输出，其它格式需要安装`pandoc`或者`calibre`。在debian系统中，可以运行一下命令安装所需软件包：
+Except epub and html formats, other formants need `pandoc` or `calibre` to be installed.
+On Debian, the installation command is
 ```
 apt install calibre pandoc texlive texlive-xetex latex-cjk-chinese texlive-lang-chinese fonts-arphic-ukai
 ```
