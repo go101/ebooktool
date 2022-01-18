@@ -65,10 +65,7 @@ func BuildBookInfoFromConfig(cfg *Config) (*BookInfo, error) {
 
 	var okVersionOnCover bool
 	info.VersionOnCover.Text, okVersionOnCover = cfg.String("cover-text.version")
-	if !okVersionOnCover && info.VersionOnCover.Text == "" {
-		info.VersionOnCover.Text = info.Version
-	}
-	if info.VersionOnCover.Text != "" {
+	if okVersionOnCover && info.VersionOnCover.Text != "" {
 		var err error
 		info.VersionOnCover.X, info.VersionOnCover.AnchorX, err = cfg.CoordinateX("cover-text.version")
 		if err != nil {
@@ -89,7 +86,12 @@ func BuildBookInfoFromConfig(cfg *Config) (*BookInfo, error) {
 			return nil, err
 		}
 		info.OutputPath = txt
+	}
 
+	// ToDo: remove the speciality
+	switch info.OutputFormat {
+	case "htmls":
+	default:
 		info.OutputPath += "." + info.OutputFormat
 	}
 

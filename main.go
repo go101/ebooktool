@@ -26,6 +26,8 @@ var (
 
 	//vFlag = flag.Bool("v", false, "verbose mode")
 	//verboseFlag = flag.Bool("verbose", false, "verbose mode")
+
+	md2htmlsFlag = flag.Bool("md2htmls", false, "md2htmls without config files")
 )
 
 func printUsage() {
@@ -48,6 +50,21 @@ func main() {
 
 	if flag.NArg() == 1 && flag.Arg(0) == "version" {
 		printVersion()
+		return
+	}
+
+	if *md2htmlsFlag {
+		// Currently, generate htmls in the same folder containing md files.
+		bookInfo := &internal.BookInfo{
+			OutputFormat: "htmls",
+			OutputPath:   ".",
+			InputFormat:  "md",
+			InputPath:    ".",
+		}
+		err := mds2htmls.Run(bookInfo)
+		if err != nil {
+			log.Println("failed to generate", bookInfo.OutputPath, ", err:", err)
+		}
 		return
 	}
 
