@@ -5,9 +5,15 @@ to the other tools.
 
 The module path of this tool is `go101.org/ebooktool`.
 
-除了epub和html版本输出，其它格式需要安装`pandoc`或者`calibre`。在debian系统中，可以运行一下命令安装所需软件包：
+Except epub and html formats, other formants need `pandoc` or `calibre` to be installed.
+On Debian, the installation command is
 ```
-apt install calibre pandoc texlive texlive-xetex latex-cjk-chinese texlive-lang-chinese fonts-arphic-ukai
+apt install calibre pandoc texlive texlive-xetex
+```
+
+For Chinese versions, more need to be installed:
+```
+apt install latex-cjk-chinese texlive-lang-chinese fonts-arphic-ukai
 ```
 
 Currently, `ebooktool` may convert the markdown files in a directory into
@@ -17,10 +23,9 @@ Currently, `ebooktool` may convert the markdown files in a directory into
 * a pdf files.
 * a mobi file.
 * an azw3 file.
+* a docx file
 
-Currently,
-* the markdown files are sorted by alphabetical order.
-* images are not handled.
+Currently, the markdown files are sorted by alphabetical order.
 
 One or more `.ini` file is needed to setup the conversion arguments.
 Run `ebooktool xxx.ini yyy.ini` to build ebooks.
