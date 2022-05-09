@@ -286,7 +286,7 @@ func (md *Markdown) Render() []byte {
 var invalidCharsInID = regexp.MustCompile(`[^0-9a-zA-Z\-\_\:\.]`)
 
 func Filename2ID(filename string) string {
-	return "f-" + ValidateIdentifier(filename)
+	return "f-" + ValidateIdentifier(filename, false)
 }
 
 func RenderMarkdownFiles(mdFiles []Markdown) map[string][]File {
